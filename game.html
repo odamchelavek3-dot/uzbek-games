@@ -1,1 +1,154 @@
 
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uzbek Games — Bilimlar Jangi</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;padding:20px;
+ display:flex;align-items:center;justify-content:center;
+ font-family:Arial,sans-serif;color:white;
+ background:linear-gradient(135deg,#080f25,#142d58,#071a30);
+}
+.card{
+ width:100%;max-width:520px;padding:30px;
+ background:#142442;border:1px solid #34517b;
+ border-radius:22px;text-align:center;
+ box-shadow:0 15px 50px #0008;
+}
+h1{color:#55d8ff;margin-bottom:5px}
+.subtitle{color:#a9c9ec}
+.stats{display:flex;justify-content:space-between;margin:25px 0}
+#question{font-size:21px;line-height:1.5;margin:25px 0}
+.answers{display:grid;gap:12px}
+.answer{
+ width:100%;padding:16px;border:1px solid #42618f;
+ border-radius:12px;background:#20395f;color:white;
+ font-size:16px;text-align:left;cursor:pointer;
+}
+.answer:hover{background:#315582}
+.answer:disabled{cursor:default}
+.correct{background:#167d4b!important}
+.wrong{background:#a93645!important}
+button{font-family:inherit}
+.action{
+ margin-top:22px;padding:14px 25px;border:0;
+ border-radius:12px;background:#39c8f4;
+ color:#071a30;font-size:16px;font-weight:bold;
+ cursor:pointer;
+}
+#next{display:none}
+#result{display:none}
+#result h2{color:#55d8ff}
+#progress{height:8px;background:#304568;border-radius:20px;overflow:hidden}
+#bar{height:100%;width:0;background:#39c8f4;transition:.3s}
+</style>
+</head>
+<body>
+
+<div class="card">
+ <h1>🧠 UZBEK GAMES</h1>
+ <p class="subtitle">BILIMLAR JANGI</p>
+
+ <div id="game">
+  <div class="stats">
+   <span id="number">Savol: 1/10</span>
+   <span id="score">Ball: 0</span>
+  </div>
+  <div id="progress"><div id="bar"></div></div>
+  <h2 id="question"></h2>
+  <div class="answers" id="answers"></div>
+  <button class="action" id="next" onclick="nextQuestion()">
+   Keyingi savol ➜
+  </button>
+ </div>
+
+ <div id="result">
+  <h2>🏆 O‘yin tugadi!</h2>
+  <h1 id="finalScore"></h1>
+  <p id="message"></p>
+  <button class="action" onclick="startGame()">🔄 Qayta o‘ynash</button>
+ </div>
+</div>
+
+<script>
+const questions=[
+ {q:"Kompyuterning miyasi nima?",a:["Monitor","Protsessor","Klaviatura","Sichqoncha"],c:1},
+ {q:"HTML nima uchun ishlatiladi?",a:["Sayt tuzilishi","Rasm chizish","Video montaj","O‘yin o‘ynash"],c:0},
+ {q:"CSS nima vazifani bajaradi?",a:["Ma'lumot saqlaydi","Saytni bezaydi","Internet beradi","Fayl o‘chiradi"],c:1},
+ {q:"Python qanday til?",a:["Dasturlash tili","Brauzer","Operatsion tizim","Antivirus"],c:0},
+ {q:"Internet nima?",a:["Kompyuter o‘yini","Global tarmoq","Klaviatura","Dastur"],c:1},
+ {q:"Google Chrome nima?",a:["Brauzer","Protsessor","Antivirus","Operatsion tizim"],c:0},
+ {q:"RAM nima?",a:["Doimiy xotira","Tezkor xotira","Monitor","Printer"],c:1},
+ {q:"JavaScript nima uchun kerak?",a:["Saytga interaktivlik berish","Kompyuterni o‘chirish","Rasm skanerlash","Internet ulash"],c:0},
+ {q:"Figma nima uchun ishlatiladi?",a:["Dizayn yaratish","Musiqa eshitish","Kod tarjima qilish","Fayl siqish"],c:0},
+ {q:"Operatsion tizimga misol qaysi?",a:["Windows","Google","HTML","Telegram"],c:0}
+];
+
+let current=0,score=0,answered=false;
+
+function startGame(){
+ current=0;score=0;
+ document.getElementById("game").style.display="block";
+ document.getElementById("result").style.display="none";
+ showQuestion();
+}
+
+function showQuestion(){
+ answered=false;
+ const item=questions[current];
+ document.getElementById("number").textContent=`Savol: ${current+1}/10`;
+ document.getElementById("score").textContent=`Ball: ${score}`;
+ document.getElementById("question").textContent=item.q;
+ document.getElementById("bar").style.width=(current/10*100)+"%";
+ const area=document.getElementById("answers");
+ area.innerHTML="";
+ item.a.forEach((answer,index)=>{
+  const btn=document.createElement("button");
+  btn.className="answer";
+  btn.textContent=String.fromCharCode(65+index)+". "+answer;
+  btn.onclick=()=>checkAnswer(index,btn);
+  area.appendChild(btn);
+ });
+ document.getElementById("next").style.display="none";
+}
+
+function checkAnswer(index,selected){
+ if(answered)return;
+ answered=true;
+ const correct=questions[current].c;
+ document.querySelectorAll(".answer").forEach((btn,i)=>{
+  btn.disabled=true;
+  if(i===correct)btn.classList.add("correct");
+ });
+ if(index===correct)score++;
+ else selected.classList.add("wrong");
+ document.getElementById("score").textContent=`Ball: ${score}`;
+ document.getElementById("next").style.display="inline-block";
+}
+
+function nextQuestion(){
+ current++;
+ if(current<questions.length)showQuestion();
+ else finishGame();
+}
+
+function finishGame(){
+ document.getElementById("game").style.display="none";
+ document.getElementById("result").style.display="block";
+ document.getElementById("finalScore").textContent=score+"/10";
+ document.getElementById("bar").style.width="100%";
+ document.getElementById("message").textContent=
+ score===10?"Ajoyib! Barcha javoblar to‘g‘ri! 🏆":
+ score>=7?"Zo‘r natija! 👏":
+ score>=4?"Yaxshi! Yana mashq qiling!":
+ "Yana urinib ko‘ring! 💪";
+}
+startGame();
+</script>
+</body>
+</html>
+
