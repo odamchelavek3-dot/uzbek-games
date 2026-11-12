@@ -34,14 +34,15 @@ def main():
     port = int(os.getenv("PORT", "10000"))
 
     print("UZBEK GAMES WEBHOOK ISHGA TUSHMOQDA!", flush=True)
-app.run_webhook(
-    listen="0.0.0.0",
-    port=port,
-    url_path=webhook_path,
-    webhook_url=f"https://{hostname}/{webhook_path}",
-    secret_token=webhook_secret,
-    allowed_updates=Update.ALL_TYPES
-)
+
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=port,
+        url_path=webhook_path,
+        webhook_url=f"https://{hostname}/{webhook_path}",
+        secret_token=webhook_secret,
+        allowed_updates=Update.ALL_TYPES
+    )
 
 
 if __name__ == "__main__":
